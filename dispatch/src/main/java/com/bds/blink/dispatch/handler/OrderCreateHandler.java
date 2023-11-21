@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 public class OrderCreateHandler {
     private final DispatchService dispatchService;
 
-    @KafkaListener(id = "OrderConsumerClient", topics = "order.created", groupId = "dispatch.order.created.consumer")
+    @KafkaListener(id = "OrderConsumerClient", topics = "order.created", groupId = "dispatch.order.created.consumer", containerFactory = "kafkaListenerContainerFactory")
     public void listen(OrderCreated payload) {
         log.info("Received payload: " + payload);
         dispatchService.process(payload);
