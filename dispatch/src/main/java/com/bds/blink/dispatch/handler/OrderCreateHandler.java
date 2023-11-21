@@ -18,6 +18,10 @@ public class OrderCreateHandler {
     @KafkaListener(id = "OrderConsumerClient", topics = "order.created", groupId = "dispatch.order.created.consumer", containerFactory = "kafkaListenerContainerFactory")
     public void listen(OrderCreated payload) {
         log.info("Received payload: " + payload);
-        dispatchService.process(payload);
+        try {
+            dispatchService.process(payload);
+        } catch (Exception e) {
+            log.error("Processing failure", e.getCause());
+        }
     }
 }
