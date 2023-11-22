@@ -21,14 +21,14 @@ public class DispatchService {
     private static final UUID APPLICATION_UUID = randomUUID();
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public void process(OrderCreated orderCreated) throws Exception {
+    public void process(String key, OrderCreated orderCreated) throws Exception {
         OrderDispatched orderDispatched = OrderDispatched
                 .builder()
                 .orderId(orderCreated.getOrderId())
                 .processedById(APPLICATION_UUID)
                 .note("Dispatched: " + orderCreated.getItem())
                 .build();
-        kafkaTemplate.send(ORDER_DISPATCHED_TOPIC, orderDispatched).get();
+        kafkaTemplate.send(ORDER_DISPATCHED_TOPIC, key, orderDispatched).get();
 
         log.info("Sent message: orderId: " + orderCreated.getOrderId() + " processed by: ", APPLICATION_UUID);
     }
