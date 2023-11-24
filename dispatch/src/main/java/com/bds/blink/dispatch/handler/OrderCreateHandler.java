@@ -6,6 +6,8 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
+import com.bds.blink.dispatch.exception.NotRetryableException;
+import com.bds.blink.dispatch.exception.RetryableException;
 import com.bds.blink.dispatch.message.OrderCreated;
 import com.bds.blink.dispatch.service.DispatchService;
 
@@ -23,8 +25,12 @@ public class OrderCreateHandler {
         log.info("Received payload: partition: " + partition + ", key: " + key + ", payload: " + payload);
         try {
             dispatchService.process(key, payload);
+        } catch(RetryableException e) {
+            log.warn("Retryable exception: " + e.getMessage());
+            throw e;
         } catch (Exception e) {
-            log.error("Processing failure", e.getCause());
+            log.error("Not retryable exception: ", e.getCause());
+            throw new NotRetryableException(e);
         }
     }
 }

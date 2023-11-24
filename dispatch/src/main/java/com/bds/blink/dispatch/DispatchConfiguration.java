@@ -17,10 +17,14 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
+import org.springframework.util.backoff.FixedBackOff;
 
+import com.bds.blink.dispatch.exception.NotRetryableException;
+import com.bds.blink.dispatch.exception.RetryableException;
 import com.bds.blink.dispatch.message.OrderCreated;
 
 @ComponentScan(basePackages = "com.bds.blink")
@@ -31,6 +35,10 @@ public class DispatchConfiguration {
             ConsumerFactory<String, Object> consumerFactory) {
         ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
+        DefaultErrorHandler errorHandler = new DefaultErrorHandler(new FixedBackOff(100L, 3L));
+        errorHandler.addNotRetryableExceptions(NotRetryableException.class);
+        errorHandler.addRetryableExceptions(RetryableException.class);
+        factory.setCommonErrorHandler(errorHandler);
         return factory;
     }
 
