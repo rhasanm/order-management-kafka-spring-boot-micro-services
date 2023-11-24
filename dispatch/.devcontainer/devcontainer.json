@@ -5,31 +5,37 @@
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	"image": "mcr.microsoft.com/devcontainers/base:jammy",
 	"features": {
-		"ghcr.io/devcontainers/features/common-utils:2": {},
+		"ghcr.io/devcontainers/features/common-utils:2": {
+			"installZsh": true,
+			"configureZshAsDefaultShell": true,
+			"installOhMyZsh": true,
+			"installOhMyZshConfig": true
+		},
 		"ghcr.io/devcontainers-contrib/features/maven-sdkman:2": {},
 		"ghcr.io/devcontainers-contrib/features/springboot-sdkman:2": {},
-		"ghcr.io/devcontainers-contrib/features/zsh-plugins:0": {}
+		"ghcr.io/devcontainers-contrib/features/zsh-plugins:0": {
+			"plugins": "ssh-agent npm zsh-autosuggestions",
+			"omzPlugins": "https://github.com/zsh-users/zsh-autosuggestions"
+		}
 	},
-	"runArgs": ["--network", "host"],
+	// "runArgs": ["--network", "host"],
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
-
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
-
 	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "uname -a",
-
+	"postCreateCommand": "git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf && yes | ~/.fzf/install && mkdir -p /home/vscode/tools && wget -O ~/tools/kafka.tgz https://downloads.apache.org/kafka/3.6.0/kafka_2.13-3.6.0.tgz && tar -xzf ~/tools/kafka.tgz -C ~/tools/ && rm -rf ~/tools/kafka.tgz && echo 'PATH=$PATH:/home/vscode/tools/kafka_2.13-3.6.0/bin' >> ~/.zshrc",
+	
 	// Configure tool-specific properties.
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				"vscjava.vscode-java-pack"
+				"vscjava.vscode-java-pack",
+				"redhat.vscode-xml"
 			]
 		}
 	}
-
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"
 }
